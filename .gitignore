@@ -1,0 +1,7 @@
+# Carpeta de salida de paquetes de Node.js
+/node_modules/
+
+/.vscode/
+# Archivo de configuración - Variables de entorno
+.env
+
