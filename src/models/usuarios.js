@@ -1,44 +1,6 @@
 import oracledb from 'oracledb';
 import bcrypt from 'bcryptjs';
 
-const findUserByEmail = async (correo) => {
-    let connection;
-    try {
-        connection = await oracledb.getConnection();
-        const result = await connection.execute(
-            `SELECT u.datos_usuario.correo FROM USUARIOS u WHERE u.datos_usuario.correo = :correo`, 
-            { correo }
-        );
-        return result.rows.length > 0; // Retorna true si el correo existe
-    } catch (error) {
-        console.error('Error al verificar correo existente:', error);
-        throw error;
-    } finally {
-        if (connection) {
-            await connection.close();
-        }
-    }
-};
-
-const findUserByDocument = async (documento_usuario) => {
-    let connection;
-    try {
-        connection = await oracledb.getConnection();
-        const result = await connection.execute(
-            `SELECT documento_usuario FROM USUARIOS WHERE documento_usuario = :documento_usuario`, 
-            { documento_usuario }
-        );
-        return result.rows.length > 0; // Retorna true si el documento existe
-    } catch (error) {
-        console.error('Error al verificar documento existente:', error);
-        throw error;
-    } finally {
-        if (connection) {
-            await connection.close();
-        }
-    }
-};
-
 const createUsuario = async (usuarioData) => {
     let connection;
     try {
@@ -123,6 +85,48 @@ const createUsuario = async (usuarioData) => {
         }
     }
 };
+
+
+
+const findUserByEmail = async (correo) => {
+    let connection;
+    try {
+        connection = await oracledb.getConnection();
+        const result = await connection.execute(
+            `SELECT u.datos_usuario.correo FROM USUARIOS u WHERE u.datos_usuario.correo = :correo`, 
+            { correo }
+        );
+        return result.rows.length > 0; // Retorna true si el correo existe
+    } catch (error) {
+        console.error('Error al verificar correo existente:', error);
+        throw error;
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+};
+
+const findUserByDocument = async (documento_usuario) => {
+    let connection;
+    try {
+        connection = await oracledb.getConnection();
+        const result = await connection.execute(
+            `SELECT documento_usuario FROM USUARIOS WHERE documento_usuario = :documento_usuario`, 
+            { documento_usuario }
+        );
+        return result.rows.length > 0; // Retorna true si el documento existe
+    } catch (error) {
+        console.error('Error al verificar documento existente:', error);
+        throw error;
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+};
+
+
 
 const findUserByEmailAuth = async (correo) => {
     let connection;
