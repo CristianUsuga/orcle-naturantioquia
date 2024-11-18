@@ -3,6 +3,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Configura el nivel de depuración
+oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
+oracledb.autoCommit = true;
+
 async function initialize() {
     try {
         await oracledb.createPool({
@@ -27,5 +31,16 @@ async function close() {
         console.error('close() error: ' + err.message);
     }
 }
-
-export { initialize, close };
+// Función adicional para registrar consultas en consola
+async function executeQuery(query, params = []) {
+    try {
+        const connection = await oracledb.getConnection();
+        console.log(`Executing query: ${query}`);
+        const result = await connection.execute(query, params);
+        console.log('Query result:', result);
+        await connection.close();
+    } catch (err) {
+        console.error('Error executing query:', err);
+    }
+}
+export { initialize, close, executeQuery  };

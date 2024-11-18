@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión - Naturantioquia</title>
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/js/login.js" defer></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body id="body_login">
+
+    <!-- Incluir la barra de navegación -->
+    <%- include('partials/navigation') %>
+    
+    <!-- Contenido principal -->
+    <main class="main_login">
+        <div class="form-login-container">
+            <div class="logo-container">
+                <img src="https://i.imgur.com/35WVtfw.png" alt="Logo de la empresa" id="img-logo-login">
+            </div>
+            <div class="info-container">
+                <div class="form-login-container-info">
+                    <h1 id="title_login">Iniciar sesión</h1>
+                    <p>Bienvenido de vuelta</p>
+                </div>
+                <div class="form-login-container-type">
+                    <form id="login-form">
+                        <input type="text" autocomplete="email" class="email" id="email" required name="username"
+                            placeholder="Correo electrónico">
+                        <input type="password" name="password" id="password" placeholder="Contraseña">
+                        <button id="button_login">Iniciar sesión</button>
+                        <p id="recuperar_contrasena">¿Olvidaste tu contraseña? - </p>
+                    </form>
+                    <div class="form-login-container-type-no-account">
+                        <p id="parr_login">¿Todavía no tienes una cuenta?</p>
+                        <a href="/registroUsuario" id="Boton_registro">Regístrate</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    
+
+    <!-- Incluir el pie de página -->
+    <%- include('partials/footer') %>
+
+</body>
+
+</html>
