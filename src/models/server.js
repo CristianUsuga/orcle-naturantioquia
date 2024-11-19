@@ -8,6 +8,10 @@ import cookieParser from 'cookie-parser';
 import { initialize, close } from '../../db/connection.js';
 import routerUser from '../routes/usuarios.js';
 import routerAuth from '../routes/auth.js';
+import routerEstadoUsuario from '../routes/estados-usuarios.js';
+import routerRoles from '../routes/roles.js';
+import routerFormularios from '../routes/formularios.js';
+
 import { methods as validarRol } from "../middlewares/index.js";
 
 
@@ -19,6 +23,9 @@ class Server {
 
         this.paths = {
             imagenesAPI: '/api/imagenes',
+            estadoUsuarios: '/api/estado-usuarios',
+            roles: '/api/roles',
+            formularios: '/api/formularios',
             categoriasProductosAPI: '/api/categoriasProductos',
             categoriasAPI: '/api/categorias',
             productosAPI: '/api/productos',
@@ -74,7 +81,10 @@ class Server {
     routes() {
         // Definir las rutas API
         this.app.use(this.paths.usuarios, routerUser);
-        this.app.use(this.paths.ingresar, routerAuth );
+        this.app.use(this.paths.ingresar, routerAuth ); 
+        this.app.use(this.paths.estadoUsuarios, routerEstadoUsuario );
+        this.app.use(this.paths.roles, routerRoles );
+        this.app.use(this.paths.formularios, routerFormularios );
         // this.app.use(this.paths.laboratorios, laboratoriosRouter);
         // this.app.use(this.paths.productosAPI, productosRouter);
         // this.app.use(this.paths.transportistas, transportistasRouter);
