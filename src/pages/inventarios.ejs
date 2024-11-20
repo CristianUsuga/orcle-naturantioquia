@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Inventarios</title>
+</head>
+<body>
+    <header>
+        <h1>Bienvenido, <%= usuario.nombre %> (Inventarios)</h1>
+    </header>
+    <main>
+        <p>Este es el panel de gestión de inventarios.</p>
+        <ul>
+            <li><a href="/api/productos">Productos en inventario</a></li>
+            <li><a href="/api/categorias">Gestión de categorías</a></li>
+        </ul>
+    </main>
+    <footer>
+        <a href="/api/auth/logout">Cerrar sesión</a>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Delegado</title>
+</head>
+<body>
+    <header>
+        <h1>Bienvenido, <%= usuario.nombre %> (Delegado)</h1>
+    </header>
+    <main>
+        <p>Este es el panel del delegado.</p>
+        <ul>
+            <li><a href="/api/transportistas">Gestión de transportistas</a></li>
+            <li><a href="/api/pedidos">Gestión de pedidos</a></li>
+        </ul>
+    </main>
+    <footer>
+        <a href="/api/auth/logout">Cerrar sesión</a>
+    </footer>
+</body>
+</html>

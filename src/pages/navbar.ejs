@@ -1,0 +1,32 @@
+<header class="header-container">
+    <nav class="navbar navbar-main">
+        <div class="navbar-main-logo">
+            <img src="https://i.imgur.com/35WVtfw.png" alt="Logo de la empresa">
+        </div>
+        <div class="navbar-main-search-bar">
+            <input type="text" placeholder="Buscar...">
+            <i class="fas fa-search"></i>
+        </div>
+        <div class="navbar-main-user-options">
+            <% if (!user) { %>
+                <div class="navbar-main-login-account">
+                    <a href="/registroUsuario">Crea cuenta</a>
+                    <span class="navbar-main-separator-account">/</span>
+                    <a href="/login">Ingresa</a>
+                </div>
+            <% } else { %>
+                <div class="navbar-main-login-account">
+                    <span><%= user.nombre %></span>
+                    <a href="/api/auth/logout">Cerrar sesión</a>
+                </div>
+            <% } %>
+            <div class="navbar-main-shopping-cart">
+                <i class="fas fa-shopping-cart fa-lg"></i>
+                <span class="navbar-main-shopping-cart-items">0</span>
+            </div>
+        </div>
+        <div class="navbar-main-menu">
+            <i class="fas fa-bars fa-lg"></i>
+        </div>
+    </nav>
+</header>

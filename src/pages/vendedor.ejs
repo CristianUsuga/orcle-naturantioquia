@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Vendedor</title>
+</head>
+<body>
+    <header>
+        <h1>Bienvenido, <%= usuario.nombre %> (Vendedor)</h1>
+    </header>
+    <main>
+        <p>Este es tu panel de vendedor.</p>
+        <ul>
+            <li><a href="/api/ventas">Historial de ventas</a></li>
+            <li><a href="/api/clientes">Gestión de clientes</a></li>
+        </ul>
+    </main>
+    <footer>
+        <a href="/api/auth/logout">Cerrar sesión</a>
+    </footer>
+</body>
+</html>

@@ -13,8 +13,8 @@ import routerRoles from '../routes/roles.js';
 import routerFormularios from '../routes/formularios.js';
 import routerPerfiles from '../routes/perfiles.js';
 
-import { methods as validarRol } from "../middlewares/index.js";
-
+import { validarJWT  } from "../middlewares/index.js";
+import { esAdminRole, esClienteRole, esDelegadoRole, esInventariosRole, esVendedorRole } from "../middlewares/validar-rol.js";
 
 class Server {
     constructor() {
@@ -23,27 +23,19 @@ class Server {
         this.__dirname = path.dirname(fileURLToPath(import.meta.url));
 
         this.paths = {
-            imagenesAPI: '/api/imagenes',
+            usuarios: '/api/usuarios',
+            auth: '/api/auth',
             estadoUsuarios: '/api/estado-usuarios',
             roles: '/api/roles',
             formularios: '/api/formularios',
             perfiles: '/api/perfiles',
-            categoriasProductosAPI: '/api/categoriasProductos',
-            categoriasAPI: '/api/categorias',
-            productosAPI: '/api/productos',
-            usuarios: '/api/usuarios',
-            login: '/login',
-            registro: '/registroUsuario',
-            ingresar: '/api/auth',
             admin: '/admin',
-            log: '/logeado',
-            about: '/about',
-            contact: '/contact',
-            services: '/services',
-            laboratorios: '/api/laboratorios',
-            laboratorio: '/laboratorio',
-            transportistas: '/api/transportistas',
-            transportista: '/transportista'
+            delegado: '/delegado',
+            inventarios: '/inventarios',
+            vendedor: '/vendedor',
+            cliente: '/cliente',
+            login: '/login',
+            registro: '/registroUsuario'
         };
 
         // Métodos iniciales
@@ -53,6 +45,7 @@ class Server {
         this.routes();
 
         // Motor de plantillas (EJS en este caso)
+        this.app.set('views', path.join(this.__dirname, '../pages'));
         this.app.set('view engine', 'ejs');
     }
 
@@ -81,33 +74,49 @@ class Server {
     }
 
     routes() {
-        // Definir las rutas API
+        this.app.use(this.paths.auth, routerAuth);
         this.app.use(this.paths.usuarios, routerUser);
-        this.app.use(this.paths.ingresar, routerAuth ); 
-        this.app.use(this.paths.estadoUsuarios, routerEstadoUsuario );
-        this.app.use(this.paths.roles, routerRoles );
-        this.app.use(this.paths.formularios, routerFormularios );
-        this.app.use(this.paths.perfiles, routerPerfiles );
-        // this.app.use(this.paths.laboratorios, laboratoriosRouter);
-        // this.app.use(this.paths.productosAPI, productosRouter);
-        // this.app.use(this.paths.transportistas, transportistasRouter);
-        // this.app.use(this.paths.categoriasAPI, routerCategorias);
-        // this.app.use(this.paths.categoriasProductosAPI, routerCategoriasProductos);
-        // this.app.use(this.paths.imagenesAPI, routerImagenesProductos);
+        this.app.use(this.paths.estadoUsuarios, routerEstadoUsuario);
+        this.app.use(this.paths.roles, routerRoles);
+        this.app.use(this.paths.formularios, routerFormularios);
+        this.app.use(this.paths.perfiles, routerPerfiles);
 
-        // Pages
-        this.app.get(this.paths.login, validarRol.soloPublico, (req, res) => res.render(path.join(this.__dirname, '/../pages/login.ejs')));
-        this.app.get(this.paths.registro, validarRol.soloPublico, (req, res) => res.render(path.join(this.__dirname, '/../pages/register.ejs')));
-        this.app.get(this.paths.about, validarRol.soloPublico, (req, res) => res.render(path.join(this.__dirname, '/../pages/about.ejs')));
-        this.app.get(this.paths.contact, validarRol.soloPublico, (req, res) => res.render(path.join(this.__dirname, '/../pages/contact.ejs')));
-        this.app.get(this.paths.services, validarRol.soloPublico, (req, res) => res.render(path.join(this.__dirname, '/../pages/services.ejs')));
+        //Rutas publicas
+        this.app.get(this.paths.login, (req, res) => {
+            res.render(path.join(this.__dirname, '/../pages/login.ejs'));
+        });
+         
 
-        this.app.get(this.paths.admin, validarRol.soloAdmin, (req, res) => res.render(path.join(this.__dirname, '/../pages/admin.ejs')));
-        this.app.get(this.paths.laboratorio, validarRol.soloAdmin, (req, res) => res.render(path.join(this.__dirname, '/../pages/forms/laboratorios.ejs')));
-        this.app.get(this.paths.transportista, validarRol.soloAdmin, (req, res) => res.render(path.join(this.__dirname, '/../pages/forms/transportistas.ejs')));
-        
-        // TODO: agregar validar rol después a logeado
-        this.app.get(this.paths.log, (req, res) => res.render(path.join(this.__dirname, '/../pages/logeado.ejs')));
+        // Rutas protegidas por rol
+        this.app.get(this.paths.admin, [validarJWT, esAdminRole], (req, res) => {
+            res.render("admin", { usuario: req.usuario });
+        });
+
+        this.app.get(this.paths.delegado, [validarJWT, esDelegadoRole], (req, res) => {
+            res.render("delegado", { usuario: req.usuario });
+        });
+
+        this.app.get(this.paths.inventarios, [validarJWT, esInventariosRole], (req, res) => {
+            res.render("inventarios", { usuario: req.usuario });
+        });
+
+        this.app.get(this.paths.vendedor, [validarJWT, esVendedorRole], (req, res) => {
+            res.render("vendedor", { usuario: req.usuario });
+        });
+
+        this.app.get(this.paths.cliente, [validarJWT, esClienteRole], (req, res) => {
+            res.render("cliente", { usuario: req.usuario });
+        });
+
+        //Manejo de errores
+        this.app.get(this.paths.admin, [validarJWT, esAdminRole], (req, res) => {
+            try {
+                res.render(path.join(this.__dirname, '../pages/admin.ejs'), { usuario: req.usuario });
+            } catch (error) {
+                console.error('Error al cargar la vista:', error);
+                res.render(path.join(this.__dirname, '../pages/error.ejs'), { error: 'Error al cargar la vista de administrador' });
+            }
+        });
     }
 
     listen() {

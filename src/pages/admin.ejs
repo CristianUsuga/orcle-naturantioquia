@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Naturantioquia</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome -->
+</head>
+<body>
+    <header class="header-container">
+        <nav class="navbar navbar-main">
+            <div class="navbar-main-logo">
+                <img src="https://i.imgur.com/35WVtfw.png" alt="Logo de Naturantioquia">
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="admin-panel">
+            <h1>Bienvenido, <%= usuario.nombre %> (Administrador)</h1>
+            
+            <h2>Gestión de Usuarios</h2>
+            
+            <!-- Botón para abrir el formulario de creación -->
+            <button id="btn-add-user" class="btn btn-primary"><i class="fas fa-user-plus"></i> Agregar Usuario</button>
+
+            <!-- Tabla para mostrar usuarios -->
+            <table id="users-table" class="table">
+                <thead>
+                    <tr>
+                        <th>Documento</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Celular</th>
+                        <th>Tipo Doc.</th>
+                        <th>Estado</th>
+                        <th>Sexo</th>
+                        <th>Rol</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Aquí se llenarán los datos con JavaScript -->
+                </tbody>
+            </table>
+
+            <!-- Controles de paginación -->
+            <div class="pagination">
+                <button id="prev-page" class="btn" disabled>Anterior</button>
+                <span id="page-info"></span>
+                <button id="next-page" class="btn">Siguiente</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Naturantioquia. Todos los derechos reservados.</p>
+        <a href="/api/auth/logout">Cerrar sesión</a>
+    </footer>
+
+    <script>
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+        headers.append("Authorization", `Bearer ${document.cookie.split('=')[1]}`);
+
+        let currentPage = 0;
+        const limit = 22;
+
+        // Obtener usuarios con paginación
+        async function fetchUsers(page = 0) {
+            try {
+                const response = await fetch(`/api/usuarios?limite=${limit}&desde=${page * limit}`, {
+                    method: 'GET',
+                    headers,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al cargar usuarios');
+                }
+
+                const { usuarios, total } = await response.json();
+                renderUsers(usuarios, page, total);
+            } catch (error) {
+                Swal.fire('Error', 'No se pudieron cargar los usuarios', 'error');
+            }
+        }
+
+        // Renderizar usuarios en la tabla
+        function renderUsers(users, page, total) {
+            const tableBody = document.querySelector('#users-table tbody');
+            tableBody.innerHTML = ''; // Limpiar tabla
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.DOCUMENTO_USUARIO}</td>
+                    <td>${user.NOMBRE_USUARIO}</td>
+                    <td>${user.PRIMER_APELLIDO_USUARIO} ${user.SEGUNDO_APELLIDO_USUARIO || ''}</td>
+                    <td>${user.CORREO}</td>
+                    <td>${user.TELEFONO_FIJO}</td>
+                    <td>${user.CELULAR}</td>
+                    <td>${user.TIPO_DOCUMENTO}</td>
+                    <td>${user.ESTADO_USUARIO}</td>
+                    <td>${user.SEXO}</td>
+                    <td>${user.ROL}</td>
+                    <td>
+                        <button class="btn btn-edit" onclick="editUser(${user.DOCUMENTO_USUARIO})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-delete" onclick="deleteUser(${user.DOCUMENTO_USUARIO})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="btn btn-activate" onclick="activateUser(${user.DOCUMENTO_USUARIO})">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Actualizar controles de paginación
+            const totalPages = Math.ceil(total / limit);
+            document.getElementById('page-info').textContent = `Página ${page + 1} de ${totalPages}`;
+            document.getElementById('prev-page').disabled = page === 0;
+            document.getElementById('next-page').disabled = page + 1 >= totalPages;
+        }
+
+        // Crear usuario
+        async function addUser(user) {
+            try {
+                const response = await fetch('/api/usuarios', {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(user),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Error al crear usuario');
+                }
+
+                Swal.fire('Éxito', 'Usuario creado correctamente', 'success');
+                fetchUsers(currentPage); // Recargar usuarios
+            } catch (error) {
+                Swal.fire('Error', error.message, 'error');
+            }
+        }
+
+        // Editar usuario
+        async function editUser(id) {
+            try {
+                const response = await fetch(`/api/usuarios/${id}`, {
+                    method: 'GET',
+                    headers,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al cargar el usuario');
+                }
+
+                const user = await response.json();
+
+                Swal.fire({
+                    title: 'Editar Usuario',
+                    html: `
+                        <input id="nombre" class="swal2-input" value="${user.NOMBRE_USUARIO}">
+                        <input id="primer_apellido_usuario" class="swal2-input" value="${user.PRIMER_APELLIDO_USUARIO}">
+                        <input id="correo" class="swal2-input" value="${user.CORREO}">
+                    `,
+                    confirmButtonText: 'Guardar',
+                    showCancelButton: true,
+                    preConfirm: () => {
+                        return {
+                            nombre: document.getElementById('nombre').value,
+                            primer_apellido_usuario: document.getElementById('primer_apellido_usuario').value,
+                            correo: document.getElementById('correo').value,
+                        };
+                    }
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        updateUser(id, result.value);
+                    }
+                });
+            } catch (error) {
+                Swal.fire('Error', 'No se pudo cargar el usuario para editar', 'error');
+            }
+        }
+
+        // Actualizar usuario
+        async function updateUser(id, data) {
+            try {
+                const response = await fetch(`/api/usuarios/admin/${id}`, {
+                    method: 'PUT',
+                    headers,
+                    body: JSON.stringify(data),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Error al actualizar usuario');
+                }
+
+                Swal.fire('Éxito', 'Usuario actualizado correctamente', 'success');
+                fetchUsers(currentPage); // Recargar usuarios
+            } catch (error) {
+                Swal.fire('Error', error.message, 'error');
+            }
+        }
+
+        // Eliminar usuario
+        async function deleteUser(id) {
+            try {
+                const response = await fetch(`/api/usuarios/${id}`, {
+                    method: 'DELETE',
+                    headers,
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Error al eliminar usuario');
+                }
+
+                Swal.fire('Éxito', 'Usuario eliminado correctamente', 'success');
+                fetchUsers(currentPage); // Recargar usuarios
+            } catch (error) {
+                Swal.fire('Error', error.message, 'error');
+            }
+        }
+
+        // Activar usuario
+        async function activateUser(id) {
+            try {
+                const response = await fetch(`/api/usuarios/reactive/${id}`, {
+                    method: 'PUT',
+                    headers,
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Error al activar usuario');
+                }
+
+                Swal.fire('Éxito', 'Usuario activado correctamente', 'success');
+                fetchUsers(currentPage); // Recargar usuarios
+            } catch (error) {
+                Swal.fire('Error', error.message, 'error');
+            }
+        }
+
+        // Controles de paginación
+        document.getElementById('prev-page').addEventListener('click', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                fetchUsers(currentPage);
+            }
+        });
+
+        document.getElementById('next-page').addEventListener('click', () => {
+            currentPage++;
+            fetchUsers(currentPage);
+        });
+
+        // Cargar usuarios al iniciar
+        fetchUsers(currentPage);
+    </script>
+</body>
+</html>

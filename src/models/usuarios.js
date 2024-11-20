@@ -133,11 +133,28 @@ const findUserByEmailAuth = async (correo) => {
     try {
         connection = await oracledb.getConnection();
         const result = await connection.execute(
-            `SELECT u.documento_usuario, u.datos_usuario.nombre, u.password_usuario AS password, 
-                    u.estado_usuario, e.estado_usuario.id AS estado_id, e.estado_usuario.nombre AS estado_nombre 
-             FROM USUARIOS u 
-             JOIN ESTADOS_USUARIOS e ON u.estado_usuario = e.estado_usuario.id
-             WHERE u.datos_usuario.correo = :correo`, 
+            `SELECT 
+                u.DOCUMENTO_USUARIO,
+                u.datos_usuario.nombre AS nombre,
+                u.datos_usuario.telefono.fijo AS fijo,
+                u.datos_usuario.telefono.movil AS celular,
+                u.datos_usuario.correo AS correo,
+                u.PRIMER_APELLIDO_USUARIO,
+                u.SEGUNDO_APELLIDO_USUARIO,
+                u.PASSWORD_USUARIO AS password,
+                u.FECHA_NACIMIENTO_USUARIO,
+                u.TIPO_DOCUMENTO,
+                u.ESTADO_USUARIO,
+                e.estado_usuario.id AS estado_id,
+                e.estado_usuario.nombre AS estado_nombre,
+                u.SEXO_USUARIO,
+                u.ROL_USUARIO AS rol_usuario
+             FROM 
+                USUARIOS u
+             JOIN 
+                ESTADOS_USUARIOS e ON u.ESTADO_USUARIO = e.estado_usuario.id
+             WHERE 
+                u.datos_usuario.correo = :correo`,
             { correo },
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
@@ -148,11 +165,20 @@ const findUserByEmailAuth = async (correo) => {
         return {
             documento_usuario: usuario.DOCUMENTO_USUARIO,
             nombre: usuario.NOMBRE,
+            fijo: usuario.FIJO,
+            celular: usuario.CELULAR,
+            correo: usuario.CORREO,
+            primer_apellido_usuario: usuario.PRIMER_APELLIDO_USUARIO,
+            segundo_apellido_usuario: usuario.SEGUNDO_APELLIDO_USUARIO,
             password: usuario.PASSWORD,
+            fecha_nacimiento_usuario: usuario.FECHA_NACIMIENTO_USUARIO,
+            tipo_documento: usuario.TIPO_DOCUMENTO,
             estado_usuario: {
                 id: usuario.ESTADO_ID,
                 nombre: usuario.ESTADO_NOMBRE
-            }
+            },
+            sexo_usuario: usuario.SEXO_USUARIO,
+            rol_usuario: usuario.ROL_USUARIO
         };
 
     } catch (error) {
