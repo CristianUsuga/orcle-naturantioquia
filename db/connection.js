@@ -15,7 +15,8 @@ async function initialize() {
             connectString: process.env.DB_CONNECTION_STRING,
             poolMin: 10,
             poolMax: 10,
-            poolIncrement: 0
+            poolIncrement: 0,
+            poolAlias: 'default'
         });
         console.log('Connection pool started');
     } catch (err) {

@@ -11,6 +11,7 @@ import routerAuth from '../routes/auth.js';
 import routerEstadoUsuario from '../routes/estados-usuarios.js';
 import routerRoles from '../routes/roles.js';
 import routerFormularios from '../routes/formularios.js';
+import routerPerfiles from '../routes/perfiles.js';
 
 import { methods as validarRol } from "../middlewares/index.js";
 
@@ -26,6 +27,7 @@ class Server {
             estadoUsuarios: '/api/estado-usuarios',
             roles: '/api/roles',
             formularios: '/api/formularios',
+            perfiles: '/api/perfiles',
             categoriasProductosAPI: '/api/categoriasProductos',
             categoriasAPI: '/api/categorias',
             productosAPI: '/api/productos',
@@ -85,6 +87,7 @@ class Server {
         this.app.use(this.paths.estadoUsuarios, routerEstadoUsuario );
         this.app.use(this.paths.roles, routerRoles );
         this.app.use(this.paths.formularios, routerFormularios );
+        this.app.use(this.paths.perfiles, routerPerfiles );
         // this.app.use(this.paths.laboratorios, laboratoriosRouter);
         // this.app.use(this.paths.productosAPI, productosRouter);
         // this.app.use(this.paths.transportistas, transportistasRouter);
